@@ -358,13 +358,13 @@ cap_co2 = 0.0; // kt C02
 
 #NODE LIQUEFIED_CO2_CARRIERS_GR = import LIQUEFIED_CO2_CARRIERS from "CO2_PIPE.gboml";
 
-#NODE CARBON_DIOXIDE_STORAGE_BE = import CARBON_DIOXIDE_STORAGE from "remote_hub_wacc.gboml";
+#NODE CARBON_DIOXIDE_STORAGE_BE = import LIQUEFIED_CO2_STORAGE from "CO2_PIPE.gboml";
 
 #NODE CO2_LIQUEFACTION_PLANTS_BE = import CO2_LIQUEFACTION_PLANTS from "CO2_PIPE.gboml";
 
 #HYPEREDGE POWER_LINE       
     #CONSTRAINTS
-        SOLAR_BE.e_produced[t] + WIND_ONSHORE_BE.e_produced[t] + WIND_OFFSHORE_BE.e_produced[t] + CCGT_BE.e_produced[t] == global.demand_el[t] + PCCC.e_consumed[t] + PCCC_CCGT.e_consumed[t] + CARBON_DIOXIDE_STORAGE_BE.electricity[t] - ENERGY_DEMAND_BE.e_ens[t] + CO2_LIQUEFACTION_PLANTS_BE.elec_in[t]; // GWh(e) // + NUCLEAR.e_produced[t] in the LHS
+        SOLAR_BE.e_produced[t] + WIND_ONSHORE_BE.e_produced[t] + WIND_OFFSHORE_BE.e_produced[t] + CCGT_BE.e_produced[t] == global.demand_el[t] + PCCC.e_consumed[t] + PCCC_CCGT.e_consumed[t] - ENERGY_DEMAND_BE.e_ens[t] + CO2_LIQUEFACTION_PLANTS_BE.elec_in[t]; // GWh(e) // + NUCLEAR.e_produced[t] in the LHS
 
 #HYPEREDGE GASEOUS_TO_LIQUID_CO2
     #CONSTRAINTS
@@ -372,7 +372,7 @@ cap_co2 = 0.0; // kt C02
 
 #HYPEREDGE LIQUEFIED_CO2_BALANCE_BE
     #CONSTRAINTS
-        CO2_LIQUEFACTION_PLANTS_BE.liquefied_co2_out[t] + CARBON_DIOXIDE_STORAGE_BE.carbon_dioxide_out[t] == LIQUEFIED_CO2_CARRIERS.liquefied_co2_in[t] + LIQUEFIED_CO2_CARRIERS_GR.liquefied_co2_in[t] + CO2_EXPORT.exported[t] + CARBON_DIOXIDE_STORAGE_BE.carbon_dioxide_in[t];
+        CO2_LIQUEFACTION_PLANTS_BE.liquefied_co2_out[t] + CARBON_DIOXIDE_STORAGE_BE.liquefied_co2_out[t] == LIQUEFIED_CO2_CARRIERS.liquefied_co2_in[t] + LIQUEFIED_CO2_CARRIERS_GR.liquefied_co2_in[t] + CO2_EXPORT.exported[t] + CARBON_DIOXIDE_STORAGE_BE.liquefied_co2_in[t];
 
 
 #HYPEREDGE APPLY_PCCC_PROD_C02
@@ -410,17 +410,23 @@ cap_co2 = 0.0; // kt C02
 #NODE DESALINATION_PLANTS = import DESALINATION_PLANTS from "remote_hub_wacc.gboml";
 #NODE DIRECT_AIR_CAPTURE_PLANTS = import DIRECT_AIR_CAPTURE_PLANTS from "remote_hub_wacc.gboml";
 #NODE HYDROGEN_STORAGE = import HYDROGEN_STORAGE from "remote_hub_wacc.gboml";
-#NODE CARBON_DIOXIDE_STORAGE = import CARBON_DIOXIDE_STORAGE from "remote_hub_wacc.gboml";
+
+#NODE CARBON_DIOXIDE_STORAGE = import LIQUEFIED_CO2_STORAGE from "CO2_PIPE.gboml";
+#NODE CO2_LIQUEFACTION_PLANTS = import CO2_LIQUEFACTION_PLANTS from "CO2_PIPE.gboml";
+
+
 #NODE WATER_STORAGE = import WATER_STORAGE from "remote_hub_wacc.gboml";
 #NODE METHANATION_PLANTS = import METHANATION_PLANTS from "remote_hub_wacc.gboml";
 #NODE METHANE_LIQUEFACTION_PLANTS = import METHANE_LIQUEFACTION_PLANTS from "remote_hub_wacc.gboml";
 #NODE LIQUEFIED_METHANE_STORAGE_HUB = import LIQUEFIED_METHANE_STORAGE_HUB from "remote_hub_wacc.gboml";
 #NODE LIQUEFIED_METHANE_CARRIERS = import LIQUEFIED_METHANE_CARRIERS from "remote_hub_wacc.gboml";
 #HYPEREDGE INLAND_POWER_BALANCE = import INLAND_POWER_BALANCE from "remote_hub_wacc.gboml"
-#HYPEREDGE COASTAL_POWER_BALANCE = import COASTAL_POWER_BALANCE from "remote_hub_wacc.gboml"
 #HYPEREDGE COASTAL_HYDROGEN_BALANCE = import COASTAL_HYDROGEN_BALANCE from "remote_hub_wacc.gboml"
 #HYPEREDGE COASTAL_WATER_BALANCE = import COASTAL_WATER_BALANCE from "remote_hub_wacc.gboml"
 
+#HYPEREDGE COASTAL_POWER_BALANCE
+#CONSTRAINTS
+    HVDC.electricity_out[t] == ELECTROLYSIS_PLANTS.electricity[t] + HYDROGEN_STORAGE.electricity[t] + DESALINATION_PLANTS.electricity[t] + WATER_STORAGE.electricity[t] + DIRECT_AIR_CAPTURE_PLANTS.electricity[t] + CO2_LIQUEFACTION_PLANTS.elec_in[t] + METHANE_LIQUEFACTION_PLANTS.electricity[t];
 
 #HYPEREDGE COASTAL_METHANE_BALANCE
     #CONSTRAINTS
@@ -429,17 +435,17 @@ cap_co2 = 0.0; // kt C02
 
 #HYPEREDGE COASTAL_LIQUEFIED_METHANE_BALANCE
     #CONSTRAINTS // GWh
-        only_carrier: METHANE_LIQUEFACTION_PLANTS.liquefied_methane[t] + LIQUEFIED_METHANE_STORAGE_HUB.liquefied_methane_out[t] == LIQUEFIED_METHANE_STORAGE_HUB.liquefied_methane_in[t] + LIQUEFIED_METHANE_CARRIERS.liquefied_methane_in[t] + LIQUEFIED_CO2_CARRIERS.liquefied_methane_in[t];
+        METHANE_LIQUEFACTION_PLANTS.liquefied_methane[t] + LIQUEFIED_METHANE_STORAGE_HUB.liquefied_methane_out[t] == LIQUEFIED_METHANE_STORAGE_HUB.liquefied_methane_in[t] + LIQUEFIED_METHANE_CARRIERS.liquefied_methane_in[t] + LIQUEFIED_CO2_CARRIERS.liquefied_methane_in[t];
 
 #NODE LIQUEFIED_CO2_REGASIFICATION = import LIQUEFIED_CO2_REGASIFICATION from "CO2_PIPE.gboml";
 
 #HYPEREDGE COASTAL_CARBON_DIOXIDE_LIQUEFIED_BALANCE
     #CONSTRAINTS
-        LIQUEFIED_CO2_CARRIERS.liquefied_co2_out[t] == LIQUEFIED_CO2_REGASIFICATION.liquefied_co2_in[t];
+        LIQUEFIED_CO2_CARRIERS.liquefied_co2_out[t] + CARBON_DIOXIDE_STORAGE.liquefied_co2_out[t] + CO2_LIQUEFACTION_PLANTS.liquefied_co2_out[t] == CARBON_DIOXIDE_STORAGE.liquefied_co2_in[t] + LIQUEFIED_CO2_REGASIFICATION.liquefied_co2_in[t];
 
 #HYPEREDGE COASTAL_CARBON_DIOXIDE_GASEOUS_BALANCE
     #CONSTRAINTS
-        LIQUEFIED_CO2_REGASIFICATION.co2_out[t] + DIRECT_AIR_CAPTURE_PLANTS.carbon_dioxide[t] + CARBON_DIOXIDE_STORAGE.carbon_dioxide_out[t] == CARBON_DIOXIDE_STORAGE.carbon_dioxide_in[t] + METHANATION_PLANTS.carbon_dioxide[t];
+        LIQUEFIED_CO2_REGASIFICATION.co2_out[t] + DIRECT_AIR_CAPTURE_PLANTS.carbon_dioxide[t] == CO2_LIQUEFACTION_PLANTS.co2_in[t] + METHANATION_PLANTS.carbon_dioxide[t];
 
 // Methane Balance belgium gas
 #HYPEREDGE DESTINATION_METHANE_BALANCE
@@ -485,7 +491,10 @@ cap_co2 = 0.0; // kt C02
 #NODE DESALINATION_PLANTS_GR = import DESALINATION_PLANTS from "remote_hub_wacc.gboml";
 #NODE DIRECT_AIR_CAPTURE_PLANTS_GR = import DIRECT_AIR_CAPTURE_PLANTS from "remote_hub_wacc.gboml";
 #NODE HYDROGEN_STORAGE_GR = import HYDROGEN_STORAGE from "remote_hub_wacc.gboml";
-#NODE CARBON_DIOXIDE_STORAGE_GR = import CARBON_DIOXIDE_STORAGE from "remote_hub_wacc.gboml";
+
+#NODE CARBON_DIOXIDE_STORAGE_GR = import LIQUEFIED_CO2_STORAGE from "CO2_PIPE.gboml";
+#NODE CO2_LIQUEFACTION_PLANTS_GR = import CO2_LIQUEFACTION_PLANTS from "CO2_PIPE.gboml";
+
 #NODE WATER_STORAGE_GR = import WATER_STORAGE from "remote_hub_wacc.gboml";
 #NODE METHANATION_PLANTS_GR = import METHANATION_PLANTS from "remote_hub_wacc.gboml";
 #NODE METHANE_LIQUEFACTION_PLANTS_GR = import METHANE_LIQUEFACTION_PLANTS from "remote_hub_wacc.gboml";
@@ -494,10 +503,6 @@ cap_co2 = 0.0; // kt C02
 #HYPEREDGE INLAND_POWER_BALANCE_GR
 	#CONSTRAINTS
 	inland_power_balance_gr: WIND_PLANTS_GR.electricity[t] + BATTERY_STORAGE_GR.electricity_out[t] == BATTERY_STORAGE_GR.electricity_in[t] + HVDC_GR.electricity_in[t];
-
-#HYPEREDGE COASTAL_POWER_BALANCE_GR
-#CONSTRAINTS
-HVDC_GR.electricity_out[t] == ELECTROLYSIS_PLANTS_GR.electricity[t] + HYDROGEN_STORAGE_GR.electricity[t] + DESALINATION_PLANTS_GR.electricity[t] + WATER_STORAGE_GR.electricity[t] + DIRECT_AIR_CAPTURE_PLANTS_GR.electricity[t] + CARBON_DIOXIDE_STORAGE_GR.electricity[t] + METHANE_LIQUEFACTION_PLANTS_GR.electricity[t];
 
 #HYPEREDGE COASTAL_HYDROGEN_BALANCE_GR
 #CONSTRAINTS
@@ -508,23 +513,26 @@ ELECTROLYSIS_PLANTS_GR.hydrogen[t] + HYDROGEN_STORAGE_GR.hydrogen_out[t] == HYDR
 DESALINATION_PLANTS_GR.water[t] + METHANATION_PLANTS_GR.water[t] + WATER_STORAGE_GR.water_out[t] == WATER_STORAGE_GR.water_in[t] + ELECTROLYSIS_PLANTS_GR.water[t] + DIRECT_AIR_CAPTURE_PLANTS_GR.water[t];
 
 
+#HYPEREDGE COASTAL_POWER_BALANCE_GR
+#CONSTRAINTS
+    HVDC_GR.electricity_out[t] == ELECTROLYSIS_PLANTS_GR.electricity[t] + HYDROGEN_STORAGE_GR.electricity[t] + DESALINATION_PLANTS_GR.electricity[t] + WATER_STORAGE_GR.electricity[t] + DIRECT_AIR_CAPTURE_PLANTS_GR.electricity[t] + CO2_LIQUEFACTION_PLANTS_GR.elec_in[t] + METHANE_LIQUEFACTION_PLANTS_GR.electricity[t];
+
 #HYPEREDGE COASTAL_METHANE_BALANCE_GR
     #CONSTRAINTS
     METHANATION_PLANTS_GR.methane[t] == METHANE_LIQUEFACTION_PLANTS_GR.methane[t];
 
 
 #HYPEREDGE COASTAL_LIQUEFIED_METHANE_BALANCE_GR
-	#CONSTRAINTS
-    METHANE_LIQUEFACTION_PLANTS_GR.liquefied_methane[t] + LIQUEFIED_METHANE_STORAGE_HUB_GR.liquefied_methane_out[t] == LIQUEFIED_METHANE_STORAGE_HUB_GR.liquefied_methane_in[t] + LIQUEFIED_METHANE_CARRIERS_GR.liquefied_methane_in[t] + LIQUEFIED_CO2_CARRIERS_GR.liquefied_methane_in[t]; // GWh;
-
+    #CONSTRAINTS // GWh
+        METHANE_LIQUEFACTION_PLANTS_GR.liquefied_methane[t] + LIQUEFIED_METHANE_STORAGE_HUB_GR.liquefied_methane_out[t] == LIQUEFIED_METHANE_STORAGE_HUB_GR.liquefied_methane_in[t] + LIQUEFIED_METHANE_CARRIERS_GR.liquefied_methane_in[t] + LIQUEFIED_CO2_CARRIERS_GR.liquefied_methane_in[t];
 
 #NODE LIQUEFIED_CO2_REGASIFICATION_GR = import LIQUEFIED_CO2_REGASIFICATION from "CO2_PIPE.gboml";
 
 #HYPEREDGE COASTAL_CARBON_DIOXIDE_LIQUEFIED_BALANCE_GR
     #CONSTRAINTS
-        LIQUEFIED_CO2_CARRIERS_GR.liquefied_co2_out[t] == LIQUEFIED_CO2_REGASIFICATION_GR.liquefied_co2_in[t];
+        LIQUEFIED_CO2_CARRIERS_GR.liquefied_co2_out[t] + CARBON_DIOXIDE_STORAGE_GR.liquefied_co2_out[t] + CO2_LIQUEFACTION_PLANTS_GR.liquefied_co2_out[t] == CARBON_DIOXIDE_STORAGE_GR.liquefied_co2_in[t] + LIQUEFIED_CO2_REGASIFICATION_GR.liquefied_co2_in[t];
 
 #HYPEREDGE COASTAL_CARBON_DIOXIDE_GASEOUS_BALANCE_GR
     #CONSTRAINTS
-        LIQUEFIED_CO2_REGASIFICATION_GR.co2_out[t] + DIRECT_AIR_CAPTURE_PLANTS_GR.carbon_dioxide[t] + CARBON_DIOXIDE_STORAGE_GR.carbon_dioxide_out[t] == CARBON_DIOXIDE_STORAGE_GR.carbon_dioxide_in[t] + METHANATION_PLANTS_GR.carbon_dioxide[t];
+        LIQUEFIED_CO2_REGASIFICATION_GR.co2_out[t] + DIRECT_AIR_CAPTURE_PLANTS_GR.carbon_dioxide[t] == CO2_LIQUEFACTION_PLANTS_GR.co2_in[t] + METHANATION_PLANTS_GR.carbon_dioxide[t];
 

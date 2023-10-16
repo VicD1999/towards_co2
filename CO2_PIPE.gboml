@@ -117,7 +117,7 @@ T = 8760;
        full_capex = 5; // M€/kt
        lifetime = 40.0;
        annualised_capex = full_capex * global.wacc * (1 + global.wacc)**lifetime / ((1 + global.wacc)**lifetime - 1); // MEur
-       fom = 0.0; // 0.25; // MEur/year
+       fom = 0.0; // MEur/year
        vom = 0.0;
        schedule = import "data/carrier_schedule.csv";
        loading_time = 24;
@@ -197,4 +197,29 @@ T = 8760;
     #OBJECTIVES
         min: global.number_years_horizon * (annualised_capex + fom) * capacity;
         min: vom * liquefied_co2_out[t];
+
+#NODE LIQUEFIED_CO2_STORAGE  // data Berger et al, Tableau Data ENS.DK ??
+    #PARAMETERS
+        full_capex_stock = 2.3; //M euro / kt
+        lifetime_stock = 30.0;
+        annualised_capex_stock = full_capex_stock * global.wacc * (1 + global.wacc)**lifetime_stock / ((1 + global.wacc)**lifetime_stock - 1); // MEur
+        fom_stock = 0.0675;
+        vom_stock = 0.0;
+    #VARIABLES
+        internal: capacity_stock;
+        internal: liquefied_co2_stored[T];
+        external: liquefied_co2_in[T];
+        external: liquefied_co2_out[T];
+    #CONSTRAINTS
+        liquefied_co2_stored[t] <= capacity_stock;
+        liquefied_co2_stored[0] == liquefied_co2_stored[T-1];
+        liquefied_co2_stored[t+1] == liquefied_co2_stored[t] + liquefied_co2_in[t] - liquefied_co2_out[t];
+        capacity_stock >= 0;
+        liquefied_co2_stored[t] >= 0;
+        liquefied_co2_in[t] >= 0;
+        liquefied_co2_out[t] >= 0;
+    #OBJECTIVES
+        min: global.number_years_horizon * (annualised_capex_stock + fom_stock) * capacity_stock;
+        min: vom_stock * liquefied_co2_stored[t];
+
 
