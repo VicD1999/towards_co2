@@ -1,13 +1,9 @@
 from gboml import GbomlGraph
-import gboml.compiler.classes as gcc
-
+from utils import get_node
 import json
 import os
-import sys
-from datetime import datetime
 import argparse
-
-# from utils import *
+import pandas as pd
 
 # if needed use click to be able to change the arguments of the main and the configuration.
 if __name__ == "__main__":
@@ -27,6 +23,8 @@ if __name__ == "__main__":
     parser.add_argument('-p_c', "--pipe_carrier", help="Select constraint",
                         choices=["pipe_and_boat", "only_carrier", "only_pipe"],
                         default="pipe_and_boat")
+    parser.add_argument('-idx', "--index", help="Index of the simulation", 
+                        type=int, default=0)
     args = parser.parse_args()
 
     name = args.name
@@ -47,27 +45,12 @@ if __name__ == "__main__":
     co2_emission_cost = 0
     constraint="only_carrier"
 
-    def modify_param_node(ls_nodes, name_node, name_param, value_param):
-        for n in ls_nodes:
-            if n.name == name_node:
-                print(n.name)
-                # l = list(map(lambda x: x.replace(p,param_to_add),l))
-                param_to_add = gcc.Parameter(name_param, gcc.Expression("literal", value_param))   
-                for p in n.parameters:
-                    if p.get_name() == name_param:
-                        p = param_to_add
-                        print(p)
-                        
-                        # n.parameters.replace(p, param_to_add)
-                        # n.parameters.remove(p)
-                # param_to_add = gcc.Parameter(name_param, gcc.Expression("literal", value_param))    
-                # n.parameters = list(map(lambda x: x.replace(p_to_modify,param_to_add), n.parameters))
-                        
-                        # n.parameters.append(param_to_add)
-    import pandas as pd
+    
     df = pd.read_csv("data/samples.csv")
 
-    idx = 7
+    idx = args.index
+    if idx >= len(df):
+        raise ValueError("Index is too high")
 
     capex_pcc = df.iloc[idx]["capex_pcc"]
     capex_co2_liq_plant = df.iloc[idx]["capex_co2_liq_plant"]
@@ -76,18 +59,20 @@ if __name__ == "__main__":
     capex_dac = df.iloc[idx]["capex_dac"]
     capex_co2_liq_storage = df.iloc[idx]["capex_co2_liq_storage"]
 
-    # MODIFY CAPEX
-    modify_param_node(ls_nodes=nodes, name_node="PCCC", name_param="capex", value_param=capex_pcc)
-    modify_param_node(ls_nodes=nodes, name_node="PCCC_CCGT", name_param="capex", value_param=capex_pcc)
-
-    modify_param_node(ls_nodes=nodes, name_node="CO2_LIQUEFACTION_PLANTS", name_param="full_capex", value_param=capex_co2_liq_plant)
-    modify_param_node(ls_nodes=nodes, name_node="LIQUEFIED_CO2_REGASIFICATION", name_param="full_capex", value_param=capex_co2_regas)
-
-    modify_param_node(ls_nodes=nodes, name_node="LIQUEFIED_CO2_CARRIERS", name_param="full_capex", value_param=capex_co2_carrier)
-    modify_param_node(ls_nodes=nodes, name_node="DIRECT_AIR_CAPTURE_PLANTS", name_param="full_capex", value_param=capex_dac)
-
-    modify_param_node(ls_nodes=nodes, name_node="LIQUEFIED_CO2_STORAGE_BE", name_param="full_capex_stock", value_param=capex_co2_liq_storage)
-    modify_param_node(ls_nodes=nodes, name_node="LIQUEFIED_CO2_STORAGE", name_param="full_capex_stock", value_param=capex_co2_liq_storage)
+    infra_co2 = {"PCCC" : ("capex", float(capex_pcc)), 
+             "PCCC_CCGT" : ("capex", float(capex_pcc)), 
+             "CO2_LIQUEFACTION_PLANTS" : ("full_capex", float(capex_co2_liq_plant)), 
+             "LIQUEFIED_CO2_REGASIFICATION" : ("full_capex", float(capex_co2_regas)), 
+             "LIQUEFIED_CO2_CARRIERS" : ("full_capex", float(capex_co2_carrier)), 
+             "DIRECT_AIR_CAPTURE_PLANTS" : ("full_capex", float(capex_dac)),
+             "CARBON_DIOXIDE_STORAGE_BE" : ("full_capex_stock", float(capex_co2_liq_storage)),
+             "CARBON_DIOXIDE_STORAGE": ("full_capex_stock", float(capex_co2_liq_storage))}
+    
+    for name_node in infra_co2.keys():
+        # print(name_node)
+        node = get_node(nodes, name_node)
+        # print(node)
+        gboml_model.redefine_parameters_from_list(node, [infra_co2[name_node][0]], [infra_co2[name_node][1]] )
 
 
     # Boat or pipe This line is needed otherwise too many constraints
@@ -105,5 +90,5 @@ if __name__ == "__main__":
     if not os.path.exists("UQ"):
         os.makedirs("UQ")
         
-    with open(f'UQ/f"{idx}_T_{timehorizon}_{capex_pcc}_{capex_co2_liq_plant}_{capex_co2_regas}_{capex_co2_carrier}_{capex_dac}_{capex_co2_liq_storage}"sc_{args.scenario}_T_{timehorizon}.json', "w") as fp:
+    with open(f'UQ/{idx}_T_{timehorizon}_{capex_pcc}_{capex_co2_liq_plant}_{capex_co2_regas}_{capex_co2_carrier}_{capex_dac}_{capex_co2_liq_storage}.json', "w") as fp:
         json.dump(gathered_data, fp, indent=4)
