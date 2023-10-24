@@ -200,7 +200,10 @@ if __name__ == '__main__':
             dac_capa = dico["solution"]["elements"]["DIRECT_AIR_CAPTURE_PLANTS"]["variables"]["capacity"]["values"][0]
         except:
             dac_capa = 0 # Greenland
-        dac_greenland = dico["solution"]["elements"]["DIRECT_AIR_CAPTURE_PLANTS_GR"]["variables"]["capacity"]["values"][0]
+        try:
+            dac_greenland = dico["solution"]["elements"]["DIRECT_AIR_CAPTURE_PLANTS_GR"]["variables"]["capacity"]["values"][0]
+        except:
+            dac_greenland = 0
         names, var = ["PCCC", "PCCC CCGT", "DAC1", "DAC2"], [pccc_capa, pccc_ccgt_capa, dac_capa, dac_greenland]
 
         results[scenario]["co2_capture"] = dict(zip(names, var))
