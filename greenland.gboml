@@ -354,8 +354,6 @@ cap_co2 = 0.0; // kt C02
 #NODE PIPE_CO2_GR = import PIPE_CO2_OFF_SHORE from "CO2_PIPE.gboml" with 
     length=3000;
 
-#NODE LIQUEFIED_CO2_CARRIERS = import LIQUEFIED_CO2_CARRIERS from "CO2_PIPE.gboml";
-
 #NODE LIQUEFIED_CO2_CARRIERS_GR = import LIQUEFIED_CO2_CARRIERS from "CO2_PIPE.gboml";
 
 #NODE CARBON_DIOXIDE_STORAGE_BE = import LIQUEFIED_CO2_STORAGE from "CO2_PIPE.gboml";
@@ -372,7 +370,7 @@ cap_co2 = 0.0; // kt C02
 
 #HYPEREDGE LIQUEFIED_CO2_BALANCE_BE
     #CONSTRAINTS
-        CO2_LIQUEFACTION_PLANTS_BE.liquefied_co2_out[t] + CARBON_DIOXIDE_STORAGE_BE.liquefied_co2_out[t] == LIQUEFIED_CO2_CARRIERS.liquefied_co2_in[t] + LIQUEFIED_CO2_CARRIERS_GR.liquefied_co2_in[t] + CO2_EXPORT.exported[t] + CARBON_DIOXIDE_STORAGE_BE.liquefied_co2_in[t];
+        CO2_LIQUEFACTION_PLANTS_BE.liquefied_co2_out[t] + CARBON_DIOXIDE_STORAGE_BE.liquefied_co2_out[t] == LIQUEFIED_CO2_CARRIERS_GR.liquefied_co2_in[t] + CO2_EXPORT.exported[t] + CARBON_DIOXIDE_STORAGE_BE.liquefied_co2_in[t];
 
 
 #HYPEREDGE APPLY_PCCC_PROD_C02
