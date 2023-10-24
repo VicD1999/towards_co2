@@ -156,3 +156,9 @@ def ens_allowed(nodes):
                     n.constraints.remove(c)
 
     return nodes
+
+
+def get_node(ls_nodes, name_node):
+    for n in ls_nodes:
+        if n.name == name_node:
+            return n
