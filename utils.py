@@ -1,5 +1,28 @@
 import gboml.compiler.classes as gcc
 
+class MakeMeReadable:
+    def __init__(self, d):
+        self.d = d
+    
+    def __dir__(self):
+        return self.d.keys()
+    
+    def __getattr__(self, v):
+        try:
+            out = self.d[v]
+            if isinstance(out, dict):
+                return MakeMeReadable(out)
+            return out
+        except:
+            return getattr(self.d, v)
+        
+    def __str__(self):
+        return str(self.d)
+    
+    def __repr__(self):
+        return repr(self.d)
+
+
 def pipe_and_or_boat(nodes, edges, constraint="pipe_and_boat"):
     """
     Remove PIPE_CO2, PIPE_CO2_GR or CARRIER_CO2, CARRIER_CO2_GR from the edges and nodes.
