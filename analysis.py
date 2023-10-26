@@ -7,6 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import argparse
+from utils import MakeMeReadable
 
 def cost_rreh(ls:list):
     if len(ls) == 0:
@@ -56,27 +57,6 @@ def plot_stackplot(timehorizon, colors, labels, data):
 
     # plt.savefig("Figures/energy_demand.png", dpi=200)
 
-class MakeMeReadable:
-    def __init__(self, d):
-        self.d = d
-    
-    def __dir__(self):
-        return self.d.keys()
-    
-    def __getattr__(self, v):
-        try:
-            out = self.d[v]
-            if isinstance(out, dict):
-                return MakeMeReadable(out)
-            return out
-        except:
-            return getattr(self.d, v)
-        
-    def __str__(self):
-        return str(self.d)
-    
-    def __repr__(self):
-        return repr(self.d)
 
 def check_results(filename, d):
     splits = filename.split("_")
@@ -181,7 +161,7 @@ if __name__ == '__main__':
                 print(f"Pipe {results[scenario]['pipe_nz']:.3f}")
 
             if constraint in ["only_carrier", "pipe_and_boat"]:
-                results[scenario]['carrier_nz'] = d.solution.elements.CARRIER_CO2.variables.capacity.values[0]
+                results[scenario]['carrier_nz'] = d.solution.elements.LIQUEFIED_CO2_CARRIERS.variables.capacity.values[0] / d.model.nodes.LIQUEFIED_CO2_CARRIERS.parameters.loading_time[0]
                 print(f"Carrier {results[scenario]['carrier_nz']:.3f}")
         except:
             results[scenario]['carrier_nz'] = 0
@@ -191,7 +171,7 @@ if __name__ == '__main__':
             results[scenario]['pipe_gr'] = d.solution.elements.PIPE_CO2_GR.variables.capacity.values[0]
             print(f"Pipe {results[scenario]['pipe_gr']:.3f}")
         if constraint in ["only_carrier", "pipe_and_boat"]:
-            results[scenario]['carrier_gr'] = d.solution.elements.LIQUEFIED_CO2_CARRIERS_GR.variables.capacity.values[0]
+            results[scenario]['carrier_gr'] = d.solution.elements.LIQUEFIED_CO2_CARRIERS_GR.variables.capacity.values[0] / d.model.nodes.LIQUEFIED_CO2_CARRIERS_GR.parameters.loading_time[0]
             print(f"Carrier {results[scenario]['carrier_gr']:.3f}\n")
 
         pccc_capa = dico["solution"]["elements"]["PCCC"]["variables"]["new_capacity"]["values"][0]
@@ -540,11 +520,15 @@ if __name__ == '__main__':
         # FLUX OUT
         try:
             methane_rreh1 = d.solution.elements.LIQUEFIED_METHANE_CARRIERS.variables.liquefied_methane_out.values
-            methane_rreh2 = d.solution.elements.LIQUEFIED_METHANE_CARRIERS_GR.variables.liquefied_methane_out.values
+
         except:
             methane_rreh1 = 0
+
+        try:
+            methane_rreh2 = d.solution.elements.LIQUEFIED_METHANE_CARRIERS_GR.variables.liquefied_methane_out.values
+        except:
             methane_rreh2 = 0
-        
+
         methane_storage_out_BE = d.solution.elements.LIQUEFIED_METHANE_STORAGE_DESTINATION.variables.liquefied_methane_out.values
 
         # FLUX IN
