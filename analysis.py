@@ -626,6 +626,10 @@ if __name__ == '__main__':
         with open(f'analysis.csv', "a") as fp:
             fp.write(f"{scenario},{timehorizon},{cap},{cost_co2},{ensAllowed},{cost_ens},{constraint},{cost_NZ},{cost_GR},{cost_BE},{obj_cost},{wind_onshore_be},{wind_off_be},{solar_be},{ccgt_be},{wind_gl},{wind_sahara},{solar_sahara},{pccc_capa},{pccc_ccgt_capa},{dac_capa},{dac_greenland},{pipe_co2_capa},{carrier_co2_capa},{pipe_co2_capa_gr},{carrier_co2_capa_gr}\n")
 
+
+        print()
+        print("END SCENARIO")
+        print()
     # LATEX FORMAT OF THE PARAMETERS 
     for f in ls:
         filename = f"Results/" + f

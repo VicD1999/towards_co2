@@ -13,7 +13,7 @@ from utils import *
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-n', '--name', help='Name gboml file',
-                        type=str, default="multi_hub")
+                        type=str, default="algeria")
     parser.add_argument('-y', '--years', help='Number of years',
                         type=int, default=3)
     parser.add_argument('-c', '--cap_co2', help="Cap on CO2 if None no cap on CO2",

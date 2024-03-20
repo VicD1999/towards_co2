@@ -272,11 +272,14 @@ def price_per_scenario_cluster(ls:list):
 
 def create_costs(ls, ls_units):
     """
-    ls: a list with names of json file to explore 
+    args:
+    -----
+        ls: a list with names of json file to explore 
     return:
     -------
-    costs: shape (len(ls), len(ls_units)) 
-    where costs[i, j] represents the total cost associated with scenario i in ls and list of nodes j in ls_units 
+        costs: numpy array of shape [len(ls), len(ls_units)] 
+               where costs[i, j] represents the total cost associated with 
+               scenario i in ls and list of nodes j in ls_units 
     """
     costs = np.zeros((len(ls), len(ls_units)))
 
@@ -335,12 +338,6 @@ def costs_subplot(ls:list):
     
     costs = create_costs(ls, ls_units)
     
-
-    # df = pd.read_csv("cost.csv")
-    # for j, ls in enumerate(ls_units):
-    #     # print(j, ls, "\n")
-    #     costs[:,j] = cost_from_df(ls, df).values
-    
     # First plot
     N = 5
     ytickx_labels = [f"Scenario {i}" for i in range(1, N+1)]
@@ -367,7 +364,7 @@ def costs_subplot(ls:list):
     axs[0].set_xticks(np.arange(0, 120000, 20_000), )
     axs[0].grid(axis='x', zorder=1)  # set the zorder of the grid to a lower value than the bars
     axs[0].legend((p1[0], p2[0], p3[0]), ('BE', 'DZ', 'GL'), fontsize=fontsize, frameon=True)
-    axs[0].set_xlabel("(a)", fontsize=fontsize)
+    axs[0].set_xlabel("M€ (a)", fontsize=fontsize)
 
     # Increase thickness of x-axis labels and legend
     axs[0].tick_params(axis='x', which='major', width=2, length=7, labelsize=fontsize)
@@ -382,7 +379,7 @@ def costs_subplot(ls:list):
     axs[1].set_yticks(ind)
     axs[1].set_yticklabels(ytickx_labels, fontsize=fontsize)
     axs[1].set_xticks(np.arange(0, 120000, 20_000), fontsize=fontsize)
-    axs[1].set_xlabel("(b)", fontsize=fontsize)
+    axs[1].set_xlabel("M€ (b)", fontsize=fontsize)
 
     axs[1].grid(axis='x', zorder=1)  # set the zorder of the grid to a lower value than the bars
     # axs[1].legend(map(lambda x: x[0], ps), ["Flexibility", "CO2 infra", "Power assets", "Conversion", "CH4 transport"], fontsize=fontsize, frameon=True)

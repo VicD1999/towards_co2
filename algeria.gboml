@@ -356,7 +356,7 @@ cap_co2 = 0.0; // kt C02
 
 #HYPEREDGE POWER_LINE       
     #CONSTRAINTS
-        SOLAR_BE.e_produced[t] + WIND_ONSHORE_BE.e_produced[t] + WIND_OFFSHORE_BE.e_produced[t] + CCGT_BE.e_produced[t] == global.demand_el[t] + PCCC.e_consumed[t] + PCCC_CCGT.e_consumed[t] - ENERGY_DEMAND_BE.e_ens[t] + CO2_LIQUEFACTION_PLANTS_BE.elec_in[t]; // GWh(e) // + NUCLEAR.e_produced[t] in the LHS
+        power_line: SOLAR_BE.e_produced[t] + WIND_ONSHORE_BE.e_produced[t] + WIND_OFFSHORE_BE.e_produced[t] + CCGT_BE.e_produced[t] == global.demand_el[t] + PCCC.e_consumed[t] + PCCC_CCGT.e_consumed[t] - ENERGY_DEMAND_BE.e_ens[t] + CO2_LIQUEFACTION_PLANTS_BE.elec_in[t]; // GWh(e) // + NUCLEAR.e_produced[t] in the LHS
 
 #HYPEREDGE GASEOUS_TO_LIQUID_CO2
     #CONSTRAINTS
