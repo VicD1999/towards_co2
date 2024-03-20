@@ -35,6 +35,8 @@ The file uq.py is responsible for solving the system for a given sample.
 
 The UQ analysis is performed using https://github.com/rheia-framework/RHEIA .
 
+This analysis was performed independently of this repository. 
+
 All results are discussed in https://orbi.uliege.be/handle/2268/309679 . 
 
 
