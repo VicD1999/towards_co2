@@ -6,11 +6,11 @@ Repository for our scientific paper results: https://orbi.uliege.be/handle/2268/
 
 # Installation
 
-First you need to setup your conda environment.
+First you need to setup your environment:
 
-```conda env create -f environment.yml```
+```pip install -r requirements. txt```
 
-You can also use any management of environment you want the installed libraries are standard:
+You can use any management of environment you want the installed libraries are standard:
 matplotlib, numpy, pandas. 
 
 The only special library is gboml. You can find the documentation and installation guide here:
