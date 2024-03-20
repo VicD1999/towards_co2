@@ -1,5 +1,4 @@
-# Towards CO2 Valorization in a multi remote renewable energy hub framework
-# with uncertainty quantification
+# Towards CO2 Valorization in a multi remote renewable energy hub framework with uncertainty quantification
 
 Repository for our scientific paper results: https://orbi.uliege.be/handle/2268/309679 .
 
